@@ -6,10 +6,9 @@ import { BaseModel, column, belongsTo, hasOne } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import type { BelongsTo, HasOne } from '@adonisjs/lucid/types/relations'
-import Paper from '#models/paper' 
+import Paper from '#models/paper'
 import Account from './account.js'
 import Address from './address.js'
-
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -35,12 +34,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare papers_id: number
 
-  @column()
-  declare accounts_id: number
-
-  @column()
-  declare address_id: number
-
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -49,15 +42,12 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 
-  
   @belongsTo(() => Paper, { foreignKey: 'papers_id' })
   declare paper: BelongsTo<typeof Paper>
 
-  
-  @hasOne(() => Account, { foreignKey: 'accounts_id' })
+  @hasOne(() => Account, { foreignKey: 'user_id' })
   declare account: HasOne<typeof Account>
 
-  
-  @belongsTo(() => Address, { foreignKey: 'address_id' })
-  declare address: BelongsTo<typeof Address>
+  @hasOne(() => Address, { foreignKey: 'user_id' })
+  declare address: HasOne<typeof Address>
 }

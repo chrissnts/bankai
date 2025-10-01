@@ -8,21 +8,22 @@ export default class Transaction extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-
   @column()
-  declare amount: number
+  declare amount: string
 
   @column()
   declare type: string
 
   @column()
-  declare account_id: number
-
-  @belongsTo(() => Account, { foreignKey: 'account_id' })
-  declare account: BelongsTo<typeof Account>
+  declare account_id: number 
+  
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+  
+  @belongsTo(() => Account, { foreignKey: 'account_id' })
+  declare account: BelongsTo<typeof Account>
+
 }
