@@ -9,7 +9,7 @@ export default class extends BaseSchema {
       table.string("city").notNullable()
       table.string("state").notNullable()
       table.string("street").notNullable()
-      table.string('houseNumber').notNullable()
+      table.string('house_number').notNullable()
       table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
       table.timestamps(true, true)
     })
