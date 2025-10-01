@@ -20,7 +20,7 @@ export default class Address extends BaseModel {
   declare state: string
 
   @column()
-  declare userId: number
+  declare user_id: number
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -28,6 +28,6 @@ export default class Address extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  @belongsTo(() => User)
+  @belongsTo(() => User, {foreignKey:  "user_id"})
   declare user: BelongsTo<typeof User>
 }

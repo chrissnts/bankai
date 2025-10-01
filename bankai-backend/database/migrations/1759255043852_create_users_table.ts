@@ -10,8 +10,6 @@ export default class extends BaseSchema {
       table.string('email').notNullable().unique()
       table.string('password').notNullable()
       table.integer('paper_id').unsigned().references('id').inTable('papers')
-      table.integer('account_id').unsigned().references('id').inTable('accounts')
-      table.integer('address_id').unsigned().references('id').inTable('addresses')
       table.timestamps(true, true)
     })
   }

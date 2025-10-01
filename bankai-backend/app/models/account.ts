@@ -33,6 +33,6 @@ export default class Account extends BaseModel {
   @belongsTo(() => User, { foreignKey: 'user_id' })
   declare user: BelongsTo<typeof User>
 
-  @hasMany(() => Transaction,)
+  @hasMany(() => Transaction, { foreignKey: 'account_id' })
   declare transactions: HasMany<typeof Transaction>
 }

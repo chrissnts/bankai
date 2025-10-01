@@ -1,4 +1,3 @@
-// User.ts
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
@@ -32,7 +31,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare password: string
 
   @column()
-  declare papers_id: number
+  declare paper_id: number
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -42,7 +41,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 
-  @belongsTo(() => Paper, { foreignKey: 'papers_id' })
+  @belongsTo(() => Paper, { foreignKey: 'paper_id' })
   declare paper: BelongsTo<typeof Paper>
 
   @hasOne(() => Account, { foreignKey: 'user_id' })

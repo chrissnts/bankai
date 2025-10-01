@@ -1,4 +1,3 @@
-// Transaction.ts
 import { DateTime } from 'luxon'
 import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import Account from './account.js'
@@ -9,7 +8,7 @@ export default class Transaction extends BaseModel {
   declare id: number
 
   @column()
-  declare amount: string
+  declare amount: number
 
   @column()
   declare type: string

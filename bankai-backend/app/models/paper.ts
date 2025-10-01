@@ -16,7 +16,7 @@ export default class Paper extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  @hasMany(() => User, { foreignKey: 'papers_id' })
+  @hasMany(() => User, { foreignKey: 'paper_id' })
   declare users: HasMany<typeof User>
 
 }
