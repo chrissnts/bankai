@@ -1,26 +1,58 @@
 export const permissions = [
   // 0 - ADMIN / GERENTE
   {
-    authenticate: true,
-    viewProfile: true,
-    createAccount: true, // pode criar contas correntes
-    makeTransfer: false, // não realiza transferências pessoais
-    checkBalance: false, // não consulta saldo de clientes
-    viewStatement: true, // pode ver extratos de clientes
-    makeInvestment: false, // não faz aplicações
-    manageClients: true, // pode cadastrar e gerenciar clientes
-    manageAccounts: true, // pode criar/editar/remover contas
+  
+    
+    listClients: true,
+    viewClient: true,
+    createClient: true,
+    editClient: true,
+    deleteClient: true,
+
+    
+    listAccounts: true,
+    viewAccount: true,
+    createAccount: true,
+    editAccount: true,
+    deleteAccount: true,
+
+    
+    listTransactions: true,
+    viewStatement: true,
+    makeTransfer: false,
+    checkBalance: false,
+
+    
+    makeInvestment: false,
+    viewInvestment: true,
   },
+
   // 1 - CLIENTE
   {
-    authenticate: true,
-    viewProfile: true,
-    createAccount: false, // cliente não cria conta manualmente
-    makeTransfer: true, // pode transferir
-    checkBalance: true, // pode ver saldo
-    viewStatement: true, // pode ver extrato
-    makeInvestment: true, // pode aplicar dinheiro
-    manageClients: false, // não pode cadastrar outros clientes
-    manageAccounts: false, // não pode criar/editar contas
+    
+
+    
+    listClients: false,
+    viewClient: false,
+    createClient: false,
+    editClient: false,
+    deleteClient: false,
+
+    
+    listAccounts: false,
+    viewAccount: true, // pode ver suas próprias contas
+    createAccount: false,
+    editAccount: false,
+    deleteAccount: false,
+
+    
+    listTransactions: true, // extrato
+    viewStatement: true,
+    makeTransfer: true,
+    checkBalance: true,
+
+    
+    makeInvestment: true,
+    viewInvestment: true, // ver extrato/investimentos próprios
   },
 ]
