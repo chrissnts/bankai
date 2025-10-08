@@ -6,7 +6,20 @@ export default class AccountsController {
   /**
    * Display a list of resource
    */
-  async index({}: HttpContext) {}
+  async index({ response }: HttpContext) {
+    try {
+      const accounts = await Account.query().preload('transactions').preload('user')
+
+      return response.status(200).json({
+        message: 'OK',
+        data: accounts,
+      })
+    } catch (error) {
+      return response.status(500).json({
+        message: 'ERROR',
+      })
+    }
+  }
 
   /**
    * Display form to create a new record
@@ -39,7 +52,24 @@ export default class AccountsController {
   /**
    * Show individual record
    */
-  async show({ params }: HttpContext) {}
+  async show({ params, response }: HttpContext) {
+    try {
+      const account = Account.query()
+        .where('id', params.id)
+        .preload('transactions')
+        .preload('user')
+        .firstOrFail()
+
+      return response.status(200).json({
+        message: 'OK',
+        data: account,
+      })
+    } catch (error) {
+      return response.status(500).json({
+        message: 'ERROR',
+      })
+    }
+  }
 
   /**
    * Edit individual record
