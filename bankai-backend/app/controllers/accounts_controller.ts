@@ -30,6 +30,7 @@ export default class AccountsController {
    * Handle form submission for the create action
    */
   async store({ request, response }: HttpContext) {
+    
     const body = request.body()
     const payload = await createAccount.validate(body)
 
