@@ -9,8 +9,14 @@
 
 import router from '@adonisjs/core/services/router'
 
+
+
+
 router.get('/', async () => {
   return {
     hello: 'world',
   }
 })
+
+
+router.resource('accounts', '#controllers/accounts_controller').apiOnly()
