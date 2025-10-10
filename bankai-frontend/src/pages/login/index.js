@@ -17,7 +17,7 @@ export default function Login() {
         setLoad(true) 
         setTimeout(() => {
             Client.get('/auth/me').then(res => {
-                navigate('/cursos')
+                navigate('/clientes')
             })
             .catch(function(error) {
                 console.log(error)
