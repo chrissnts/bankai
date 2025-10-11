@@ -35,28 +35,15 @@ router
   })
   .prefix('/auth')
 
-/**
- * 📜 Endpoint de documentação / teste
- */
-router.get('/hello', async () => {
-  return {
-    message: 'API AdonisJS com autenticação via Access Tokens',
-    version: '1.0.0',
-    endpoints: {
-      auth: {
-        register: 'POST /auth/register',
-        login: 'POST /auth/login',
-        logout: 'POST /auth/logout (protegida)',
-        me: 'GET /auth/me (protegida)',
-        tokens: 'GET /auth/tokens (protegida)',
-        createToken: 'POST /auth/tokens (protegida)',
-      },
-      entidades: {
-        cursos: 'CRUD /cursos (protegida)',
-        disciplinas: 'CRUD /disciplinas (protegida)',
-        alunos: 'CRUD /alunos (protegida)',
-        matriculas: 'GET/POST/DELETE /matriculas (protegida)',
-      },
-    },
-  }
-})
+
+router
+  .group(() => {
+    router.get('/', '#controllers/clients_controller.index') .use([middleware.auth()])      // listar todos os clientes
+    router.post('/', '#controllers/clients_controller.store') .use([middleware.auth()])      // criar cliente
+    router.get('/:id', '#controllers/clients_controller.show') .use([middleware.auth()])     // mostrar cliente específico
+    router.put('/:id', '#controllers/clients_controller.update') .use([middleware.auth()])   // atualizar cliente
+    router.delete('/:id', '#controllers/clients_controller.destroy') .use([middleware.auth()]) // deletar cliente
+  })
+  .prefix('/clients')
+  
+

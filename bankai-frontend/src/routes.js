@@ -3,9 +3,9 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "./pages/login";
 import Error from "./pages/error";
 import Home from "./pages/home";
-import Clientes from "./pages/clientes";
-import ClientesCreate from "./pages/clientes/create";
-// import ClientesEdit from './pages/clientes/edit'
+import Clients  from "./pages/clients";
+import ClientsCreate from "./pages/clients/create";
+// import ClientsEdit from './pages/Clients /edit'
 
 const router = createBrowserRouter([
   {
@@ -25,16 +25,16 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/clietes",
-    element: <Clientes />,
+    path: "/clients",
+    element: <Clients />,
   },
   {
-    path: "/clientes/create",
-    element: <ClientesCreate />,
+    path: "/clients/create",
+    element: <ClientsCreate />,
   },
 //   {
-//       path: "/clientes/edit",
-//     element: <ClientesEdit />,
+//       path: "/Clients /edit",
+//     element: <Clients Edit />,
 //   },
 
 ]);

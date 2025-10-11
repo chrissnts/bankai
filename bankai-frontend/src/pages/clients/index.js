@@ -1,5 +1,5 @@
-import { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import { OrbitProgress } from "react-loading-indicators";
 import NavigationBar from '../../components/navigationbar';
@@ -24,7 +24,7 @@ export default function Home() {
         setLoad(true) 
         setTimeout(() => {
     
-            Client.get('clientes').then(res => {
+            Client.get('clients').then(res => {
                 const clientes = res.data
                 console.log(clientes)
                 setData(clientes.data)
@@ -68,12 +68,12 @@ export default function Home() {
                 <Container className='mt-2'>
                     <DataTable 
                         title="Clientes Registrados" 
-                        rows={['Nome', 'Email', 'Ações']}
+                        rows={['Nome', 'Email', 'CPF', 'Endereço']}
                         hide={[false, true, false]}
                         data={data}
-                        keys={['Nome', 'Email']}
-                        resource='clientes'
-                        crud={['viewCliente', 'createCliente', 'editCliente', 'deleteCliente']}
+                        keys={['name', 'email', 'cpf', 'endereco']}
+                        resource='clients'
+                        crud={['viewClient', 'createClient', 'editClient', 'deleteClient']}
                     />
                 </Container>
             }
