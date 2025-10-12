@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import NavigationBar from '../../components/navigationbar';
 import { 
@@ -8,43 +8,40 @@ import {
     Submit,
 } from "./style"
 import { Client } from '../../api/client';
-// import UserContext from '../../contexts/UserContext'
 import { getPermissions } from '../../service/PermissionService';
 import { getDataUser } from '../../service/UserService';
 
 export default function Create() {
 
     const [name, setName] = useState('')
-    const [duration, setDuration] = useState('')
     const [email, setEmail] = useState('')
     const [cpf, setCPF] = useState('') 
-    const [endereco, setEndereco] = useState('')
+    const [address, setAddress] = useState('')
 
     const navigate = useNavigate();
-    // const { user } = useContext(UserContext);
     const permissions = getPermissions()
     const dataUser  = getDataUser()
     
     function sendData() {
 
-        const user = { nome: name, duracao: duration }
-        // console.log(user)
+        const user = { nome: name, email: email, cpf: cpf, address: address }
+        console.log(user)
 
-        Client.post('cursos', user).then(response => {
+        Client.post('clients', user).then(response => {
             console.log(response.data);
         })
         .catch(error => {
             console.error(error);
         });
 
-        navigate('/cursos')
+        navigate('/clients')
     }
 
     function verifyPermission() {
        // Não Autenticado   
         if(!dataUser) navigate('/login')
         // Não Autorizado (rota anterior)
-        else if(permissions.createCurso === 0) navigate(-1)
+        else if(permissions.createClients === 0) navigate(-1)
     }
     
     useEffect(() => {
@@ -55,7 +52,7 @@ export default function Create() {
         <>
             <NavigationBar />
              <Container className='mt-2'>
-                <Label>Nome</Label>
+                <Label>Name</Label>
                  <Input
                     type="text" 
                     id="name" 
@@ -82,13 +79,13 @@ export default function Create() {
                 <Label>Endereço</Label>
                 <Input
                     type="text"
-                    id="endereco"
-                    name="endereco"
-                    value={endereco}
-                    onChange={(e) => setEndereco(e.target.value)}
+                    id="address"
+                    name="address"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
                 />
                 <br/>
-                <Submit value="Voltar" onClick={() => navigate('/cursos')  }/>
+                <Submit value="Voltar" onClick={() => navigate('/clients')  }/>
                 <Submit value="Cadastrar" onClick={() => sendData() }/>
              </Container>
         </>

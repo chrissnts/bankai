@@ -48,7 +48,7 @@ export default function FormLogin() {
                 setDataUser(load.user)
                 setToken(load.token.value)
                 setPermissions(load.permissions)
-                navigate('/cursos')
+                navigate('/clients')
             })
             .catch(function(error) {
                 setView(true)

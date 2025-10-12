@@ -4,8 +4,6 @@ import { createClient, updateClient } from '#validators/client'
 import ClientPolicy from '#policies/client_policy'
 
 
-// PROBLEMA COM BOUNCER AQUI, VERIFICAR DEPOIS. É POR ISSO QUE NAO TA LISTANDO OS CLIENTES NO FRONTEND
-
 export default class ClientsController {
   /**
    * Listar todos os clientes
