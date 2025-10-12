@@ -1,7 +1,7 @@
 export const permissions = [
   null, 
   {
-    // ID 1 → Admin/Gerente
+    // ID 1, Admin/Gerente
     listClients: true,
     viewClient: true,
     createClient: true,
@@ -16,14 +16,14 @@ export const permissions = [
 
     listTransactions: true,
     viewStatement: true,
+
     makeTransfer: false,
     checkBalance: false,
-
     makeInvestment: false,
     viewInvestment: true,
   },
   {
-    // ID 2 → Client
+    // ID 2, Client
     listClients: false,
     viewClient: false,
     createClient: false,
@@ -38,9 +38,9 @@ export const permissions = [
 
     listTransactions: true,
     viewStatement: true,
+    
     makeTransfer: true,
     checkBalance: true,
-
     makeInvestment: true,
     viewInvestment: true,
   }

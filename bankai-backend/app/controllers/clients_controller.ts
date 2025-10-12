@@ -3,60 +3,78 @@ import User from '#models/user'
 import { createClient, updateClient } from '#validators/client'
 import ClientPolicy from '#policies/client_policy'
 
-
 export default class ClientsController {
   /**
    * Listar todos os clientes
    */
   async index({ auth, bouncer, response }: HttpContext) {
-  try {
-    const user = await auth.getUserOrFail()
-
-    if (await bouncer.with(ClientPolicy).denies('list')) {
-      return response.forbidden({ message: 'Você não tem permissão para listar clientes' })
-    }
-
-    const clients = await User.all()
-
-    return response.status(200).json({
-      message: 'OK',
-      data: clients,
-    })
-  } catch (error) {
-    console.error(error)
-    return response.status(500).json({
-      message: 'Erro ao listar clientes',
-      error: error.message,
-    })
-  }
-}
-
-  /**
-   * Criar um novo cliente
-   */
-  async store({ auth, bouncer, request, response }: HttpContext) {
-    const payload = await request.validateUsing(createClient)
-
     try {
       const user = await auth.getUserOrFail()
 
-      if (await bouncer.with(ClientPolicy).denies('create')) {
-        return response.forbidden({ message: 'Você não tem permissão para criar clientes' })
+      if (await bouncer.with(ClientPolicy).denies('list')) {
+        return response.forbidden({ message: 'Você não tem permissão para listar clientes' })
       }
 
-      const client = await User.create(payload)
+      // para nao listar o admin, so os clientes e pra carregar a conta do cliente ja (pai eh o rei de resolve problema)
+      const clients = await User.query().whereNot('paper_id', '1').preload('account')
 
-      return response.status(201).json({
-        message: 'Cliente criado com sucesso',
-        data: client,
+      return response.status(200).json({
+        message: 'OK',
+        data: clients,
       })
     } catch (error) {
+      console.error(error)
       return response.status(500).json({
-        message: 'Erro ao criar cliente',
+        message: 'Erro ao listar clientes',
         error: error.message,
       })
     }
   }
+
+  /**
+   * Criar um novo cliente
+   */
+ async store({ auth, bouncer, request, response }: HttpContext) {
+  try {
+    const payload = await request.validateUsing(createClient)
+    const user = await auth.getUserOrFail()
+
+    if (await bouncer.with(ClientPolicy).denies('create')) {
+      return response.forbidden({ message: 'Você não tem permissão para criar clientes' })
+    }
+
+    
+    const client = await User.create({
+      fullName: payload.full_name,
+      email: payload.email,
+      password: payload.password,
+      cpf: payload.cpf,
+      paper_id: 2, // pra nao ser admin (deve ter um jeito melhor pra isso, sla)
+    })
+
+    
+    await client.related('address').create({
+      city: payload.city,
+      state: payload.state,
+      street: payload.street,
+      houseNumber: payload.house_number,
+    })
+
+    
+    await client.load('address')
+
+    return response.status(201).json({
+      message: 'Cliente criado com sucesso',
+      data: client,
+    })
+  } catch (error) {
+    console.error(error)
+    return response.status(500).json({
+      message: 'Erro ao criar cliente',
+      error: error.message,
+    })
+  }
+}
 
   /**
    * Mostrar um cliente específico
@@ -69,7 +87,7 @@ export default class ClientsController {
         return response.forbidden({ message: 'Você não tem permissão para visualizar clientes' })
       }
 
-      const client = await User.findOrFail(params.id)
+      const client = await User.query().where('id', params.id).preload('account').firstOrFail()
 
       return response.status(200).json({
         message: 'OK',

@@ -1,82 +1,90 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Container } from 'react-bootstrap';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Container } from "react-bootstrap";
 import { OrbitProgress } from "react-loading-indicators";
-import NavigationBar from '../../components/navigationbar';
-import DataTable from '../../components/datatable';
-import { Client } from '../../api/client'
+import NavigationBar from "../../components/navigationbar";
+import DataTable from "../../components/datatable";
+import { Client } from "../../api/client";
 
-import { getPermissions } from '../../service/PermissionService';
-import { getDataUser } from '../../service/UserService';
+import { getPermissions } from "../../service/PermissionService";
+import { getDataUser } from "../../service/UserService";
 
 export default function Home() {
+  const [data, setData] = useState([]);
+  const [load, setLoad] = useState(true);
+  const navigate = useNavigate();
+  const permissions = getPermissions();
+  const dataUser = getDataUser();
 
-    const [data, setData] = useState([])
-    const [load, setLoad] = useState(true)
-    const navigate = useNavigate();
-    const permissions = getPermissions()
-    const dataUser  = getDataUser()
+  function fetchData() {
+    console.log(permissions);
 
-    function fetchData() {
+    setLoad(true);
+    setTimeout(() => {
+      Client.get("clients")
+        .then((res) => {
+          const clientes = res.data.data.map((cliente) => ({
+            ...cliente,
+            agency_number: cliente.account?.agency || "N/A",
+            account_number: cliente.account?.accountNumber || "N/A",
+          }));
 
-        console.log(permissions)
+          console.log(clientes);
+          setData(clientes);
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
+        .finally(() => {
+          setLoad(false);
+        });
+    }, 1000);
+  }
 
-        setLoad(true) 
-        setTimeout(() => {
-    
-            Client.get('clients').then(res => {
-                const clientes = res.data
-                console.log(clientes)
-                setData(clientes.data)
-            })
-            .catch(function(error) {
-                console.log(error)
-                // alert('ERROR')
-            })
-            .finally( () => {
-                setLoad(false)
-            })
+  function verifyPermission() {
+    // Não Autenticado
+    if (!dataUser) navigate("/login");
+    // Não Autorizado (rota anterior)
+    else if (permissions.listClients === 0) navigate(-1);
+  }
 
-        }, 1000)
-    }
+  useEffect(() => {
+    verifyPermission();
+    fetchData();
+  }, []);
 
-    function verifyPermission() {
-        // Não Autenticado   
-        if(!dataUser) navigate('/login')
-        // Não Autorizado (rota anterior)
-        else if(permissions.listCliente === 0) navigate(-1)
-    }
-
-    useEffect(() => {
-        verifyPermission()
-        fetchData()
-    }, []);
-
-    
-
-    return (
-        <>
-            <NavigationBar />
-            {
-                load 
-                ?
-                    <Container className="d-flex justify-content-center mt-5">
-                        <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
-                    </Container>
-                :
-            
-                <Container className='mt-2'>
-                    <DataTable 
-                        title="Clientes Registrados" 
-                        rows={['Nome', 'Email', ]}
-                        hide={[false, true, false]}
-                        data={data}
-                        keys={['fullName', 'email' ]}
-                        resource='clients'
-                        crud={['viewClient', 'createClient', 'editClient', 'deleteClient']}
-                    />
-                </Container>
-            }
-        </>
-    )
+  return (
+    <>
+      <NavigationBar />
+      {load ? (
+        <Container className="d-flex justify-content-center mt-5">
+          <OrbitProgress
+            variant="spokes"
+            color="#32cd32"
+            size="medium"
+            text=""
+            textColor=""
+          />
+        </Container>
+      ) : (
+        <Container className="mt-2">
+          <DataTable
+            title="Clientes Registrados"
+            rows={["Nome", "Email", "CPF", "Agência", "Conta"]}
+            hide={[false, true, false, true, true]}
+            data={data}
+            keys={[
+              "fullName",
+              "email",
+              "cpf",
+              "agency_number",
+              "account_number",
+            ]}
+            resource="clients"
+            crud={["viewClient", "createClient", "editClient", "deleteClient"]}
+          />
+        </Container>
+      )}
+    </>
+  );
 }
