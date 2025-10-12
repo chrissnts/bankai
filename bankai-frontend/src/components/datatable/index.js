@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {Table, Button, Modal } from 'react-bootstrap';
 import { Title } from './style'
 import { Client } from '../../api/client';

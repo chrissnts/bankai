@@ -68,10 +68,10 @@ export default function Home() {
                 <Container className='mt-2'>
                     <DataTable 
                         title="Clientes Registrados" 
-                        rows={['Nome', 'Email', 'CPF', 'Endereço']}
+                        rows={['Nome', 'Email', ]}
                         hide={[false, true, false]}
                         data={data}
-                        keys={['name', 'email', 'cpf', 'endereco']}
+                        keys={['fullName', 'email' ]}
                         resource='clients'
                         crud={['viewClient', 'createClient', 'editClient', 'deleteClient']}
                     />

@@ -6,11 +6,11 @@ import { permissions } from '../utils/permissions.js'
 export default class InvestmentPolicy extends BasePolicy {
   view(user: User | null): AuthorizerResponse {
     if (!user) return false
-    return permissions[user.paper_id].viewInvestment
+    return permissions[user.paper_id - 1].viewInvestment
   }
 
   makeInvestment(user: User | null): AuthorizerResponse {
     if (!user) return false
-    return permissions[user.paper_id].makeInvestment
+    return permissions[user.paper_id - 1].makeInvestment
   }
 }

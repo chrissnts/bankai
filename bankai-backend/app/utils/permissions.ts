@@ -1,30 +1,7 @@
 export const permissions = [
-
-  // 1 - CLIENTE
+  null, 
   {
-    listClients: false,
-    viewClient: false,
-    createClient: false,
-    editClient: false,
-    deleteClient: false,
-
-    listAccounts: false,
-    viewAccount: true, // pode ver suas próprias contas
-    createAccount: false,
-    editAccount: false,
-    deleteAccount: false,
-
-    listTransactions: true, // extrato
-    viewStatement: true,
-    makeTransfer: true,
-    checkBalance: true,
-
-    makeInvestment: true,
-    viewInvestment: true, // ver extrato/investimentos próprios
-  }, 
-  
-  // 1 - ADMIN / GERENTE
-  {
+    // ID 1 → Admin/Gerente
     listClients: true,
     viewClient: true,
     createClient: true,
@@ -45,6 +22,26 @@ export const permissions = [
     makeInvestment: false,
     viewInvestment: true,
   },
+  {
+    // ID 2 → Client
+    listClients: false,
+    viewClient: false,
+    createClient: false,
+    editClient: false,
+    deleteClient: false,
 
-  
+    listAccounts: false,
+    viewAccount: true,
+    createAccount: false,
+    editAccount: false,
+    deleteAccount: false,
+
+    listTransactions: true,
+    viewStatement: true,
+    makeTransfer: true,
+    checkBalance: true,
+
+    makeInvestment: true,
+    viewInvestment: true,
+  }
 ]
