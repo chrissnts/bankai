@@ -3,6 +3,7 @@ import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany, BelongsTo } from '@adonisjs/lucid/types/relations'
 import Transaction from '#models/transaction'
 import User from './user.js'
+import Application from '#models/application'
 
 export default class Account extends BaseModel {
 
@@ -35,4 +36,7 @@ export default class Account extends BaseModel {
 
   @hasMany(() => Transaction, { foreignKey: 'account_id' })
   declare transactions: HasMany<typeof Transaction>
+
+  @hasMany(() => Application, { foreignKey: 'account_id' })
+  declare applications: HasMany<typeof Application>
 }
