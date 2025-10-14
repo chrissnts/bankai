@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
-import { Container } from 'react-bootstrap';
+import { Container, Modal, Button } from 'react-bootstrap';
 import NavigationBar from '../../components/navigationbar';
-import { Label, Input, Submit } from "./style"
+import { Label, Input, Submit } from "./style";
 import { Client } from '../../api/client';
 import { getPermissions } from '../../service/PermissionService';
 import { getDataUser } from '../../service/UserService';
@@ -17,31 +17,44 @@ export default function Create() {
     const [street, setStreet] = useState('');
     const [houseNumber, setHouseNumber] = useState('');
 
+    const [showModal, setShowModal] = useState(false);
+    const [message, setMessage] = useState('');
+
     const navigate = useNavigate();
     const permissions = getPermissions();
     const dataUser = getDataUser();
 
     function sendData() {
-    const user = {
-        full_name: fullName,
-        email: email,
-        password: password,     
-        cpf: cpf,
-        city: city,             
-        state: state,
-        street: street,
-        house_number: houseNumber,
-    }
+        // Verifica se todos os campos foram preenchidos
+        if (!fullName || !email || !password || !cpf || !city || !state || !street || !houseNumber) {
+            setMessage("Todos os campos são obrigatórios!");
+            setShowModal(true);
+            return;
+        }
 
-    Client.post('clients', user)
-        .then(response => {
-            console.log(response.data);
-            navigate('/clients')
-        })
-        .catch(error => {
-            console.error(error.response.data) 
-        })
-}
+        const user = {
+            full_name: fullName,
+            email: email,
+            password: password,
+            cpf: cpf,
+            city: city,
+            state: state,
+            street: street,
+            house_number: houseNumber,
+        };
+
+        Client.post('clients', user)
+            .then(response => {
+                console.log(response.data);
+                setMessage("Cliente cadastrado com sucesso!");
+                setShowModal(true);
+            })
+            .catch(error => {
+                console.error(error.response?.data || error);
+                setMessage("Erro ao cadastrar cliente. Verifique os dados e tente novamente.");
+                setShowModal(true);
+            });
+    }
 
     function verifyPermission() {
         if (!dataUser) navigate('/login');
@@ -51,6 +64,11 @@ export default function Create() {
     useEffect(() => {
         verifyPermission();
     }, []);
+
+    function handleClose() {
+        setShowModal(false);
+        if (message === "Cliente cadastrado com sucesso!") navigate('/clients');
+    }
 
     return (
         <>
@@ -84,6 +102,17 @@ export default function Create() {
                 <Submit value="Voltar" onClick={() => navigate('/clients')} />
                 <Submit value="Cadastrar" onClick={sendData} />
             </Container>
+
+            {/* Modal de feedback */}
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Informação</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{message}</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={handleClose}>OK</Button>
+                </Modal.Footer>
+            </Modal>
         </>
-    )
+    );
 }

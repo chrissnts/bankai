@@ -7,23 +7,25 @@ import { getPermissions } from '../../service/PermissionService';
 import { getDataUser } from '../../service/UserService';
 import { Input, Label, Submit } from './style';
 
-// ARRUMAR: NAO DA PRA CRIAR CONTA (FAZER VERIFICACOES TAMBEM NOS CAMPOS, NAO DEIXAR CRIAR AS CONTAS E ETC E BLA BLA)
+// (FAZER VERIFICACOES TAMBEM NOS CAMPOS, NAO DEIXAR CRIAR AS CONTAS E ETC E BLA BLA)
+// (VERIFICAR SE O USUARIO JA TEM UMA CONTA, SE SIM NAO DEIXAR CRIAR OUTRA)
+// (VERIFICAR SE AGENCIA E CONTA JA EXISTEM, SE SIM NAO DEIXAR CRIAR OUTRA, TALVEZ LIDAR COM AGENCIA E CONTA DE OUTRA FORMA)
+// ARRUMAR O CAMPO DE CONTA PRA SER STRING E NAO NUMERO
 
 export default function CreateAccount() {
 
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState('');
     const [agency, setAgency] = useState('');
-    const [accountNumber, setAccountNumber] = useState('');
+    const [account_number, setAccount_number] = useState('');
     const [balance, setBalance] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [message, setMessage] = useState('');
-
     const navigate = useNavigate();
     const permissions = getPermissions();
     const dataUser = getDataUser();
 
-    // Busca usuários para relacionar com a conta
+
     function fetchUsers() {
         Client.get('clients')
             .then(res => {
@@ -43,9 +45,9 @@ export default function CreateAccount() {
         fetchUsers();
     }, []);
 
-    // Envia dados para criar a conta
+    
     function createAccount() {
-        if (!selectedUser || !agency || !accountNumber || !balance) {
+        if (!selectedUser || !agency || !account_number || !balance) {
             setMessage("Todos os campos são obrigatórios!");
             setShowModal(true);
             return;
@@ -54,12 +56,13 @@ export default function CreateAccount() {
         const newAccount = {
             user_id: selectedUser,
             agency,
-            accountNumber,
+            account_number,
             balance: parseFloat(balance)
         };
 
         Client.post('accounts', newAccount)
-            .then(res => {
+            .then(response => {
+                console.log(response.data);
                 setMessage("Conta criada com sucesso!");
                 setShowModal(true);
             })
@@ -72,7 +75,7 @@ export default function CreateAccount() {
 
     const handleClose = () => {
         setShowModal(false);
-        navigate('/accounts'); // volta para a lista de contas
+        if (message === "Conta criada com sucesso!") navigate('/accounts');
     }
 
     return (
@@ -91,7 +94,7 @@ export default function CreateAccount() {
                 <Input type="text" value={agency} onChange={(e) => setAgency(e.target.value)} />
 
                 <Label>Conta</Label>
-                <Input type="text" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} />
+                <Input type="text" value={account_number} onChange={(e) => setAccount_number(e.target.value)} />
 
                 <Label>Saldo Inicial</Label>
                 <Input type="number" value={balance} onChange={(e) => setBalance(e.target.value)} />

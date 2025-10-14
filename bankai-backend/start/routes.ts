@@ -53,7 +53,7 @@ router
   .use([middleware.auth()])
 
 /**
- * Rotas de Contas (Accounts)
+ * Rotas de Contas
  */
 router
   .group(() => {
