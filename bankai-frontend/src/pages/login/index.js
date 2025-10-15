@@ -12,22 +12,25 @@ export default function Login() {
     const navigate = useNavigate();
     const [load, setLoad] = useState(true)
 
-    function fetchData() {
+   function fetchData() {
+    setLoad(true)
+    setTimeout(() => {
+        Client.get('/auth/me')
+            .then(res => {
+                const user = res.data
 
-        setLoad(true) 
-        setTimeout(() => {
-            Client.get('/auth/me').then(res => {
-                navigate('/clients')
+                if (user.paper_id === 1) {
+                    navigate('/clients')  
+                } else {
+                    navigate('/home') 
+                }
             })
-            .catch(function(error) {
+            .catch(error => {
                 console.log(error)
             })
-            .finally( () => {
-                setLoad(false)
-            })
-
-        }, 1000)
-    }
+            .finally(() => setLoad(false))
+    }, 1000)
+}
 
     useEffect(() => {
         fetchData()

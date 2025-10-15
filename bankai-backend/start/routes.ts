@@ -1,17 +1,8 @@
-/*
-|--------------------------------------------------------------------------
-| Routes file
-|--------------------------------------------------------------------------
-|
-| Aqui ficam todas as rotas da aplicação.
-|
-*/
-
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 
 /**
- * Rota inicial (teste)
+ * Rota inicial
  */
 router.get('/', async () => {
   return { message: 'API ONLINE' }
@@ -20,48 +11,47 @@ router.get('/', async () => {
 /**
  * Rotas de autenticação
  */
-router
-  .group(() => {
-    // Rotas públicas
-    router.post('/register', '#controllers/auth_controller.register')
-    router.post('/login', '#controllers/auth_controller.login')
+router.group(() => {
+  // Rotas públicas
+  router.post('/register', '#controllers/auth_controller.register')
+  router.post('/login', '#controllers/auth_controller.login')
 
-    // Rotas protegidas
-    router
-      .group(() => {
-        router.post('/logout', '#controllers/auth_controller.logout')
-        router.get('/me', '#controllers/auth_controller.me')
-        router.get('/tokens', '#controllers/auth_controller.tokens')
-        router.post('/tokens', '#controllers/auth_controller.createToken')
-      })
-      .use([middleware.auth()])
-  })
-  .prefix('/auth')
+  // Rotas protegidas por login
+  router.group(() => {
+    router.post('/logout', '#controllers/auth_controller.logout')
+    router.get('/me', '#controllers/auth_controller.me')
+    router.get('/tokens', '#controllers/auth_controller.tokens')
+    router.post('/tokens', '#controllers/auth_controller.createToken')
+  }).use([middleware.auth()])
+}).prefix('/auth')
 
 /**
- * Rotas de Clientes
+ * Rotas de Clientes (apenas admin)
  */
-router
-  .group(() => {
-    router.get('/', '#controllers/clients_controller.index')
-    router.post('/', '#controllers/clients_controller.store')
-    // router.get('/:id', '#controllers/clients_controller.show') (nao to usando por enquanto no frontend)
-    router.put('/:id', '#controllers/clients_controller.update')
-    router.delete('/:id', '#controllers/clients_controller.destroy')
-  })
-  .prefix('/clients')
-  .use([middleware.auth()])
+router.group(() => {
+  router.get('/', '#controllers/clients_controller.index')
+  router.post('/', '#controllers/clients_controller.store')
+  router.put('/:id', '#controllers/clients_controller.update')
+  router.delete('/:id', '#controllers/clients_controller.destroy')
+}).prefix('/clients')
+  .use([middleware.auth(), middleware.admin()])
 
 /**
- * Rotas de Contas
+ * Rotas de Contas 
  */
-router
-  .group(() => {
-    router.get('/', '#controllers/accounts_controller.index')
-    router.post('/', '#controllers/accounts_controller.store')
-    router.get('/:id', '#controllers/accounts_controller.show')
-    router.put('/:id', '#controllers/accounts_controller.update')
-    router.delete('/:id', '#controllers/accounts_controller.destroy')
-  })
-  .prefix('/accounts')
+router.group(() => {
+  router.get('/', '#controllers/accounts_controller.index')
+  router.post('/', '#controllers/accounts_controller.store')
+  router.get('/:id', '#controllers/accounts_controller.show')
+  router.put('/:id', '#controllers/accounts_controller.update')
+  router.delete('/:id', '#controllers/accounts_controller.destroy')
+}).prefix('/accounts')
+  .use([middleware.auth(), middleware.admin()])
+
+/**
+ * Rotas de transações do usuário (Pix, Aplicação, Extrato)
+ */
+router.group(() => {
+  // router.post('/pix', '#controllers/transactions_controller.pix')
+}).prefix('/transactions')
   .use([middleware.auth()])

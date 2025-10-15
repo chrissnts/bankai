@@ -41,19 +41,24 @@ function NavigationBar() {
             style={{ maxHeight: '100px' }}
             navbarScroll
           >
-            <Nav.Link onClick={() => navigate('/clients')}>
-               <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#555" className="bi bi-person-fill" viewBox="0 0 16 16">
-                  <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-              </svg>
-              <span className="ms-1 fw-bolder">Clientes</span>
-            </Nav.Link>
-            <Nav.Link onClick={() => navigate('/accounts')}>
-               <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#555" className="bi bi-credit-card-fill" viewBox="0 0 16 16">
-                   <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1H0V4zm0 3h16v5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V7zm3 3.5a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1H3z"/>
-                </svg>
-              <span className="ms-1 fw-bolder">Contas</span>
-            </Nav.Link>
-    
+             {/* Apenas exibe se for admin */}
+            {dataUser && dataUser.paper_id === 1 && (
+              <>
+                <Nav.Link onClick={() => navigate('/clients')}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#555" className="bi bi-person-fill" viewBox="0 0 16 16">
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                  </svg>
+                  <span className="ms-1 fw-bolder">Clientes</span>
+                </Nav.Link>
+
+                <Nav.Link onClick={() => navigate('/accounts')}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#555" className="bi bi-credit-card-fill" viewBox="0 0 16 16">
+                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1H0V4zm0 3h16v5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V7zm3 3.5a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1H3z"/>
+                  </svg>
+                  <span className="ms-1 fw-bolder">Contas</span>
+                </Nav.Link>
+              </>
+            )}
           </Nav>
           <NavDropdown title={<DropTitle text={ dataUser ? dataUser.fullName : 'Visitante' } />} id="navbarScrollingDropdown" className="m-5">
               <NavDropdown.Item href="#" className="m-0">{ dataUser ? dataUser.email : 'visitante@gmail.com'}</NavDropdown.Item>

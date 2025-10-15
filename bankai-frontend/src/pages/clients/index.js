@@ -9,7 +9,7 @@ import { Client } from "../../api/client";
 import { getPermissions } from "../../service/PermissionService";
 import { getDataUser } from "../../service/UserService";
 
-export default function Home() {
+export default function Clients() {
   const [data, setData] = useState([]);
   const [load, setLoad] = useState(true);
   const navigate = useNavigate();

@@ -7,7 +7,6 @@ import DataTable from '../../components/datatable';
 import { Client } from '../../api/client'
 import { getPermissions } from '../../service/PermissionService';
 import { getDataUser } from '../../service/UserService';
-import { Input, Label, Submit } from './style';
 
 export default function ContaCorrente() {
 
