@@ -41,8 +41,7 @@ function NavigationBar() {
             style={{ maxHeight: '100px' }}
             navbarScroll
           >
-             {/* Apenas exibe se for admin */}
-            {dataUser && dataUser.paper_id === 1 && (
+            
               <>
                 <Nav.Link onClick={() => navigate('/clients')}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#555" className="bi bi-person-fill" viewBox="0 0 16 16">
@@ -58,7 +57,7 @@ function NavigationBar() {
                   <span className="ms-1 fw-bolder">Contas</span>
                 </Nav.Link>
               </>
-            )}
+            
           </Nav>
           <NavDropdown title={<DropTitle text={ dataUser ? dataUser.fullName : 'Visitante' } />} id="navbarScrollingDropdown" className="m-5">
               <NavDropdown.Item href="#" className="m-0">{ dataUser ? dataUser.email : 'visitante@gmail.com'}</NavDropdown.Item>

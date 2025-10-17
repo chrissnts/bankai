@@ -1,90 +1,136 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { OrbitProgress } from "react-loading-indicators";
 import NavigationBar from "../../components/navigationbar";
-import DataTable from "../../components/datatable";
 import { Client } from "../../api/client";
-
-import { getPermissions } from "../../service/PermissionService";
 import { getDataUser } from "../../service/UserService";
 
-export default function Clients() {
-  const [data, setData] = useState([]);
-  const [load, setLoad] = useState(true);
+import { Label, Input, Submit } from "./style";
+
+export default function UserHome() {
+  const [user, setUser] = useState(getDataUser());
+  const [saldo, setSaldo] = useState(0);
+  const [extrato, setExtrato] = useState([]);
+  const [destino, setDestino] = useState("");
+  const [valor, setValor] = useState("");
+  const [load, setLoad] = useState(false);
+  const [msg, setMsg] = useState("");
   const navigate = useNavigate();
-  const permissions = getPermissions();
-  const dataUser = getDataUser();
 
+  // Carrega saldo e extrato do usuário
   function fetchData() {
-    console.log(permissions);
-
     setLoad(true);
-    setTimeout(() => {
-      Client.get("clients")
-        .then((res) => {
-          const clientes = res.data.data.map((cliente) => ({
-            ...cliente,
-            agency_number: cliente.account?.agency || "N/A",
-            account_number: cliente.account?.accountNumber || "N/A",
-          }));
-
-          console.log(clientes);
-          setData(clientes);
-        })
-        .catch(function (error) {
-          console.log(error);
-        })
-        .finally(() => {
-          setLoad(false);
-        });
-    }, 1000);
-  }
-
-  function verifyPermission() {
-    // Não Autenticado
-    if (!dataUser) navigate("/login");
-    // Não Autorizado (rota anterior)
-    else if (permissions.listClients === 0) navigate(-1);
+    Client.get(`users/${user.id}/account`)
+      .then((res) => {
+        setSaldo(res.data.saldo);
+        setExtrato(res.data.extrato);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoad(false));
   }
 
   useEffect(() => {
-    verifyPermission();
-    fetchData();
+    if (!user) navigate("/login");
+    else fetchData();
   }, []);
+
+  // Função de Transferência (Pix)
+  function handlePix() {
+    if (Number(valor) <= 0) {
+      setMsg("Valor inválido!");
+      return;
+    }
+    if (Number(valor) > saldo) {
+      setMsg("Saldo insuficiente!");
+      return;
+    }
+
+    Client.post(`transactions/pix`, { destino, valor })
+      .then((res) => {
+        setMsg("Transferência realizada!");
+        fetchData();
+        setDestino("");
+        setValor("");
+      })
+      .catch((err) => setMsg("Erro na transferência."));
+  }
+
+  // Função de Aplicação financeira
+  function handleAplicacao() {
+    if (Number(valor) <= 0 || Number(valor) > saldo) {
+      setMsg("Valor inválido ou saldo insuficiente!");
+      return;
+    }
+
+    Client.post(`transactions/aplicacao`, { valor })
+      .then((res) => {
+        setMsg("Aplicação realizada!");
+        fetchData();
+        setValor("");
+      })
+      .catch((err) => setMsg("Erro na aplicação."));
+  }
 
   return (
     <>
       <NavigationBar />
-      {load ? (
-        <Container className="d-flex justify-content-center mt-5">
-          <OrbitProgress
-            variant="spokes"
-            color="#32cd32"
-            size="medium"
-            text=""
-            textColor=""
-          />
-        </Container>
-      ) : (
-        <Container className="mt-2">
-          <DataTable
-            title="Clientes Registrados"
-            rows={["Nome", "Email", "CPF", "Agência", "Conta"]}
-            hide={[false, true, false, true, true]}
-            data={data}
-            keys={[
-              "fullName",
-              "email",
-              "cpf",
-              "agency_number",
-              "account_number",
-            ]}
-            resource="clients"
-            crud={["viewClient", "createClient", "editClient", "deleteClient"]}
-          />
-        </Container>
-      )}
+      <Container className="mt-3">
+        {load ? (
+          <Container className="d-flex justify-content-center mt-5">
+            <OrbitProgress variant="spokes" color="#32cd32" size="medium" />
+          </Container>
+        ) : (
+          <>
+            <h3>Bem-vindo, {user.fullName}</h3>
+            <p>Saldo Atual: R$ {saldo.toFixed(2)}</p>
+
+            <hr />
+
+            <h5>Efetuar Transferência (Pix)</h5>
+            <Label>Conta de Destino:</Label>
+            <Input
+              value={destino}
+              onChange={(e) => setDestino(e.target.value)}
+            />
+            <Label>Valor:</Label>
+            <Input
+              type="number"
+              value={valor}
+              onChange={(e) => setValor(e.target.value)}
+            />
+            <Submit value="Enviar Pix" onClick={handlePix} />
+
+            <hr />
+
+            <h5>Efetuar Aplicação Financeira</h5>
+            <Label>Valor:</Label>
+            <Input
+              type="number"
+              value={valor}
+              onChange={(e) => setValor(e.target.value)}
+            />
+            <Submit value="Aplicar" onClick={handleAplicacao} />
+
+            <hr />
+
+            <h5>Extrato de Movimentações</h5>
+            <Container>
+              {extrato.map((item, index) => (
+                <Row key={index}>
+                  <Col>{item.tipo}</Col>
+                  <Col>
+                    {item.tipo === "retirada" ? "-" : "+"} R$ {item.valor.toFixed(2)}
+                  </Col>
+                  <Col>{new Date(item.data).toLocaleString()}</Col>
+                </Row>
+              ))}
+            </Container>
+
+            {msg && <p>{msg}</p>}
+          </>
+        )}
+      </Container>
     </>
   );
 }

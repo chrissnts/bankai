@@ -36,21 +36,21 @@ export default class ClientsController {
    */
  async store({ auth, bouncer, request, response }: HttpContext) {
   try {
-    const payload = await request.validateUsing(createClient)
-    const user = await auth.getUserOrFail()
+    const payload = await request.validateUsing(createClient);
+    const user = await auth.getUserOrFail();
 
     if (await bouncer.with(ClientPolicy).denies('create')) {
-      return response.forbidden({ message: 'Você não tem permissão para criar clientes' })
+      return response.forbidden({ message: 'Você não tem permissão para criar clientes' });
     }
 
-    
+    // Criando cliente
     const client = await User.create({
       fullName: payload.full_name,
       email: payload.email,
       password: payload.password,
       cpf: payload.cpf,
-      paper_id: 2, // pra nao ser admin (deve ter um jeito melhor pra isso, sla)
-    })
+      paper_id: 2, 
+    });
 
     
     await client.related('address').create({
@@ -58,21 +58,38 @@ export default class ClientsController {
       state: payload.state,
       street: payload.street,
       houseNumber: payload.house_number,
-    })
+    });
 
     
-    await client.load('address')
+    await client.related('account').create({
+      agency: '0001', 
+    });
+
+    await client.load('address');
+    await client.load('account');
 
     return response.status(201).json({
       message: 'Cliente criado com sucesso',
       data: client,
-    })
+    });
+
   } catch (error) {
-    console.error(error)
+    console.error(error);
+
+   
+    if (error?.messages) {
+      
+      return response.status(400).json({
+        message: 'Erro de validação',
+        errors: error.messages,
+      });
+    }
+
+    
     return response.status(500).json({
       message: 'Erro ao criar cliente',
       error: error.message,
-    })
+    });
   }
 }
 

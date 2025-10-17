@@ -18,12 +18,9 @@ export default function Login() {
         Client.get('/auth/me')
             .then(res => {
                 const user = res.data
+                console.log(user.paper_id)
 
-                if (user.paper_id === 1) {
-                    navigate('/clients')  
-                } else {
-                    navigate('/home') 
-                }
+               navigate('/home')
             })
             .catch(error => {
                 console.log(error)

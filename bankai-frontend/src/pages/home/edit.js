@@ -46,7 +46,7 @@ export default function Edit() {
 
     function handleCloseModal() {
         setShowModal(false);
-        navigate('/clients');
+        navigate('/home');
     }
 
     function verifyPermission() {
@@ -84,7 +84,7 @@ export default function Edit() {
                 <Input type="text" value={houseNumber} onChange={e => setHouseNumber(e.target.value)} />
 
                 <br />
-                <Submit value="Voltar" onClick={() => navigate('/clients')} />
+                <Submit value="Voltar" onClick={() => navigate('/home')} />
                 <Submit value="Alterar" onClick={updateClient} />
             </Container>
 

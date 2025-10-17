@@ -2,10 +2,10 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "./pages/login";
 import Error from "./pages/error";
-import Home from "./pages/home";
 import Clients from "./pages/clients";
-import ClientsCreate from "./pages/clients/create";
-import ClientsEdit from "./pages/clients/edit";
+import Home from "./pages/home";
+import HomeCreate from "./pages/home/create";
+import HomeEdit from "./pages/home/edit";
 import Account from "./pages/accounts";
 import CreateAccount from "./pages/accounts/create";
 
@@ -27,16 +27,16 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
+    path: "/home/create",
+    element: <HomeCreate />
+  },
+  {
+    path: "/home/edit",
+    element: <HomeEdit />
+  },
+  {
     path: "/clients",
     element: <Clients />,
-  },
-  {
-    path: "/clients/create",
-    element: <ClientsCreate />,
-  },
-  {
-    path: "/clients/edit",
-    element: <ClientsEdit />,
   },
   {
     path: "/accounts",

@@ -8,7 +8,6 @@ export default class extends BaseSeeder {
       const users = await User.query().limit(5)
       for (let i = 0; i < users.length; i++) {
       await Account.create({
-        account_number: 1000 + i, 
         balance: 0, 
         agency: '0001', 
         isActive: true,

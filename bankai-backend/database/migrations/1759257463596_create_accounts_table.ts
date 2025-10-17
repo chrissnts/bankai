@@ -5,8 +5,7 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id')
-      table.string('account_number').notNullable().unique()
+      table.increments('id') // id vai ser usado como account_number pq assim da pra fazer auto increment no numero da conta (melhor solução que pensei)
       table.decimal('balance', 12, 2).notNullable().defaultTo(0)
       table.string('agency').notNullable()
       table.boolean('is_active').notNullable().defaultTo(true)

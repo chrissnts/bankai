@@ -5,11 +5,12 @@ export const createClient = vine.compile(
     full_name: vine.string().trim(),
     email: vine.string().trim().email(),
     password: vine.string().trim().minLength(6),
-    cpf: vine.string().trim().minLength(11).maxLength(11),
+    cpf: vine.string().trim().fixedLength(11),
     city: vine.string().trim(),
     state: vine.string().trim(),
     street: vine.string().trim(),
     house_number: vine.string().trim(),
+    paper_id: vine.number().positive().withoutDecimals().optional(),
   })
 )
 

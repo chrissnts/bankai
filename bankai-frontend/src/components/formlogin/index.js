@@ -49,12 +49,8 @@ export default function FormLogin() {
           setToken(data.token.value);
           setPermissions(data.permissions);
 
-          // Redirecionamento baseado no papel do usuário
-          if (data.user.paper_id === 1) {
-            navigate("/clients"); // Admin
-          } else {
-            navigate("/home"); // Usuário comum
-          }
+          navigate("/home");
+
         })
         .catch((error) => {
           setView(true);
