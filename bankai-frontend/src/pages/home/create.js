@@ -45,25 +45,25 @@ export default function Create() {
     };
 
     Client.post('clients', payload)
-    .then((response) => {
-      console.log(response.data);
-      setMessage("Cliente cadastrado com sucesso!");
-      setShowModal(true);
-    })
-    .catch((error) => {
-      console.error(error.response?.data || error);
+      .then((response) => {
+        console.log(response.data);
+        setMessage("Cliente cadastrado com sucesso!");
+        setShowModal(true);
+      })
+      .catch((error) => {
+        console.error(error.response?.data || error);
 
-      
-      const errorData = error.response?.data;
-      if (errorData?.errors) {
-       
-        setMessage(`Erros: ${errorData.errors.join(', ')}`);
-      } else {
-        setMessage(errorData?.message || "Erro desconhecido. Tente novamente.");
-      }
 
-      setShowModal(true);
-    });
+        const errorData = error.response?.data;
+        if (errorData?.errors) {
+
+          setMessage(`Erros: ${errorData.errors.join(', ')}`);
+        } else {
+          setMessage(errorData?.message || "Erro desconhecido. Tente novamente.");
+        }
+
+        setShowModal(true);
+      });
   }
 
   function handleClose() {
@@ -139,7 +139,8 @@ export default function Create() {
         </div>
       </Container>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      {/* Modal de feedback */}
+      <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Informação</Modal.Title>
         </Modal.Header>

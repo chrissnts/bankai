@@ -37,13 +37,14 @@ export default class ClientsController {
  async store({ auth, bouncer, request, response }: HttpContext) {
   try {
     const payload = await request.validateUsing(createClient);
+    console.log(payload);  
     const user = await auth.getUserOrFail();
 
     if (await bouncer.with(ClientPolicy).denies('create')) {
       return response.forbidden({ message: 'Você não tem permissão para criar clientes' });
     }
 
-    // Criando cliente
+    
     const client = await User.create({
       fullName: payload.full_name,
       email: payload.email,
@@ -64,6 +65,7 @@ export default class ClientsController {
     await client.related('account').create({
       agency: '0001', 
     });
+
 
     await client.load('address');
     await client.load('account');

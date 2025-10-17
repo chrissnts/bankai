@@ -9,19 +9,17 @@ import { Input, Label, Submit } from './style';
 
 // (FAZER VERIFICACOES TAMBEM NOS CAMPOS, NAO DEIXAR CRIAR AS CONTAS E ETC E BLA BLA)
 // (VERIFICAR SE O USUARIO JA TEM UMA CONTA, SE SIM NAO DEIXAR CRIAR OUTRA)
-// (VERIFICAR SE AGENCIA E CONTA JA EXISTEM, SE SIM NAO DEIXAR CRIAR OUTRA, TALVEZ LIDAR COM AGENCIA E CONTA DE OUTRA FORMA)
-// ARRUMAR O CAMPO DE CONTA PRA SER STRING E NAO NUMERO
+// (VERIFICAR  CONTA JA EXISTE, SE SIM NAO DEIXAR CRIAR OUTRA)
+
 
 export default function CreateAccount() {
 
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState('');
-    const [agency, setAgency] = useState('');
-    const [account_number, setAccount_number] = useState('');
     const [balance, setBalance] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [message, setMessage] = useState('');
-    const navigate = useNavigate();
+    const navigate = useNavigate(); 
     const permissions = getPermissions();
     const dataUser = getDataUser();
 
@@ -47,7 +45,7 @@ export default function CreateAccount() {
 
     
     function createAccount() {
-        if (!selectedUser || !agency || !account_number || !balance) {
+        if (!selectedUser || !balance) {
             setMessage("Todos os campos são obrigatórios!");
             setShowModal(true);
             return;
@@ -55,8 +53,6 @@ export default function CreateAccount() {
 
         const newAccount = {
             user_id: selectedUser,
-            agency,
-            account_number,
             balance: parseFloat(balance)
         };
 
@@ -89,12 +85,6 @@ export default function CreateAccount() {
                         <option key={user.id} value={user.id}>{user.fullName}</option>
                     ))}
                 </select>
-
-                <Label>Agência</Label>
-                <Input type="text" value={agency} onChange={(e) => setAgency(e.target.value)} />
-
-                <Label>Conta</Label>
-                <Input type="text" value={account_number} onChange={(e) => setAccount_number(e.target.value)} />
 
                 <Label>Saldo Inicial</Label>
                 <Input type="number" value={balance} onChange={(e) => setBalance(e.target.value)} />

@@ -14,9 +14,9 @@ export default function ContaCorrente() {
     const [load, setLoad] = useState(true);
     const navigate = useNavigate();
     const permissions = getPermissions();
-    const dataUser  = getDataUser();
+    const dataUser = getDataUser();
 
-   
+
     function fetchAccounts() {
         setLoad(true);
         setTimeout(() => {
@@ -26,7 +26,9 @@ export default function ContaCorrente() {
                         ...acc,
                         clientName: acc.user?.fullName || 'N/A',
                         agency: acc.agency,
-                        accountNumber: acc.accountNumber,
+                        accountNumber: acc.id
+                            ? String(acc.id).padStart(6, "0")
+                            : "N/A",
                         balance: acc.balance
                     }));
 
@@ -37,7 +39,7 @@ export default function ContaCorrente() {
         }, 1000);
     }
 
-    
+
     function verifyPermission() {
         if (!dataUser) navigate('/login');
         else if (permissions.listAccounts === 0) navigate(-1);
@@ -52,15 +54,15 @@ export default function ContaCorrente() {
     return (
         <>
             <NavigationBar />
-            {load ? 
+            {load ?
                 <Container className="d-flex justify-content-center mt-5">
                     <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
                 </Container>
-            :
+                :
                 <Container className='mt-2'>
-                    <DataTable 
-                        title="Contas Correntes" 
-                        rows={['Cliente', 'Agência', 'Conta', 'Saldo', ]}
+                    <DataTable
+                        title="Contas Correntes"
+                        rows={['Cliente', 'Agência', 'Conta', 'Saldo',]}
                         hide={[false, false, false, false]}
                         data={data}
                         keys={['clientName', 'agency', 'accountNumber', 'balance']}
@@ -70,7 +72,7 @@ export default function ContaCorrente() {
                 </Container>
             }
 
-           
+
         </>
     )
 }
