@@ -57,7 +57,7 @@ export default function Create() {
         const errorData = error.response?.data;
         if (errorData?.errors) {
 
-          setMessage(`Erros: ${errorData.errors.join(', ')}`);
+          setMessage(errorData.errors[0].message);
         } else {
           setMessage(errorData?.message || "Erro desconhecido. Tente novamente.");
         }

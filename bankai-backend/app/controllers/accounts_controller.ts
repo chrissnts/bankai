@@ -17,7 +17,8 @@ export default class AccountsController {
 
       const accounts = await Account.query()
         .preload('user', (userQuery) => userQuery.select(['id', 'fullName']))
-        .preload('transactions').whereNot('id', 1) 
+        .preload('transactions')
+        .whereNot('id', 1)
 
       return response.status(200).json({
         message: 'OK',

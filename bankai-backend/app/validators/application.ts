@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const createTransaction = vine.compile(
+export const createApplication = vine.compile(
   vine.object({
     type: vine.string().trim().minLength(1),
     account_id: vine.number().positive().withoutDecimals(),
@@ -8,7 +8,7 @@ export const createTransaction = vine.compile(
   })
 )
 
-export const updateTransaction = vine.compile(
+export const updateApplication = vine.compile(
   vine.object({
     type: vine.string().trim().minLength(1).optional(),
     account_id: vine.number().positive().withoutDecimals().optional(),

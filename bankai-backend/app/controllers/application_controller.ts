@@ -1,31 +1,29 @@
-import Transaction from '#models/transaction'
-import TransactionPolicy from '#policies/transaction_policy'
-import { createTransaction } from '#validators/transaction'
-import type { HttpContext } from '@adonisjs/core/http'
+import { HttpContext } from '@adonisjs/core/http'
 
-export default class TransactionsController {
-  /**
-   * Display a list of resource
-   */
+import Application from '#models/application'
+import InvestmentPolicy from '#policies/investment_policy'
+import { createApplication } from '#validators/application'
+
+export default class ApplicationController {
   async index({ auth, bouncer, response }: HttpContext) {
     try {
       const user = await auth.getUserOrFail()
 
-      if (await bouncer.with(TransactionPolicy).denies('list')) {
-        return response.forbidden({ message: 'Você não tem permissão para listar transações' })
+      if (await bouncer.with(InvestmentPolicy).denies('view')) {
+        return response.forbidden({ message: 'Você não tem permissão para listar aplicações' })
       }
 
-      const transactions = await Transaction.query().preload('account', (AccountQuery) =>
+      const applications = await Application.query().preload('account', (AccountQuery) =>
         AccountQuery.select('id', 'account_number')
       )
 
       return response.status(201).json({
         message: 'OK',
-        data: transactions,
+        data: applications,
       })
     } catch (error) {
       return response.status(500).json({
-        message: 'Erro ao listar transações',
+        message: 'Erro ao listar aplicações',
       })
     }
   }
@@ -41,24 +39,24 @@ export default class TransactionsController {
     try {
       const user = await auth.getUserOrFail()
 
-      if (await bouncer.with(TransactionPolicy).denies('makeTransfer')) {
-        return response.forbidden({ message: 'Você não tem permissão para fazer transações' })
+      if (await bouncer.with(InvestmentPolicy).denies('makeInvestment')) {
+        return response.forbidden({ message: 'Você não tem permissão para fazer aplicações' })
       }
 
       const body = request.body()
-      const payload = await createTransaction.validate(body)
+      const payload = await createApplication.validate(body)
 
-      const transaction = await Transaction.create({
+      const application = await Application.create({
         ...payload,
       })
 
       return response.status(201).json({
-        message: 'Transação feita com sucesso',
-        data: transaction,
+        message: 'Aplicação feita com sucesso',
+        data: application,
       })
     } catch (error) {
       return response.status(500).json({
-        message: 'Erro na transação',
+        message: 'Erro na aplicação',
       })
     }
   }
@@ -70,15 +68,15 @@ export default class TransactionsController {
     try {
       const user = auth.getUserOrFail()
 
-      if (await bouncer.with(TransactionPolicy).denies('view')) {
-        return response.forbidden({ message: 'Você não tem permissão para ver esta transação' })
+      if (await bouncer.with(InvestmentPolicy).denies('view')) {
+        return response.forbidden({ message: 'Você não tem permissão para ver esta aplicação' })
       }
 
-      const transaction = await Transaction.query().where('id', params.id)
+      const application = await Application.query().where('id', params.id)
 
       return response.status(201).json({
         message: 'OK',
-        data: transaction,
+        data: application,
       })
     } catch (error) {
       return response.status(500).json({

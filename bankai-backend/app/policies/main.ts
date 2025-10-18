@@ -13,6 +13,7 @@
 */
 
 export const policies = {
+  AddressPolicy: () => import('#policies/address_policy'),
   AccountPolicy: () => import('#policies/transaction_policy'),
   ClientPolicy: () => import('#policies/client_policy'),
   TransactionPolicy: () => import('#policies/transaction_policy'),

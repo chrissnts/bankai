@@ -8,7 +8,7 @@ export default class Application extends BaseModel {
   declare id: number
 
   @column()
-  declare amount:number 
+  declare amount: number 
 
   @column()
   declare type: string
