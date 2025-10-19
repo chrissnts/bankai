@@ -2,7 +2,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "./pages/login";
 import Error from "./pages/error";
-import Clients from "./pages/clients";
 import Home from "./pages/home";
 import HomeCreate from "./pages/home/create";
 import HomeEdit from "./pages/home/edit";
@@ -33,10 +32,6 @@ const router = createBrowserRouter([
   {
     path: "/home/edit",
     element: <HomeEdit />
-  },
-  {
-    path: "/clients",
-    element: <Clients />,
   },
   {
     path: "/accounts",

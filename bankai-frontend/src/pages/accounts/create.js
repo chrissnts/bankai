@@ -7,11 +7,6 @@ import { getPermissions } from '../../service/PermissionService';
 import { getDataUser } from '../../service/UserService';
 import { Input, Label, Submit } from './style';
 
-// (FAZER VERIFICACOES TAMBEM NOS CAMPOS, NAO DEIXAR CRIAR AS CONTAS E ETC E BLA BLA)
-// (VERIFICAR SE O USUARIO JA TEM UMA CONTA, SE SIM NAO DEIXAR CRIAR OUTRA)
-// (VERIFICAR  CONTA JA EXISTE, SE SIM NAO DEIXAR CRIAR OUTRA)
-
-
 export default function CreateAccount() {
 
     const [users, setUsers] = useState([]);

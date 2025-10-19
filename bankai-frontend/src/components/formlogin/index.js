@@ -50,7 +50,6 @@ export default function FormLogin() {
           setPermissions(data.permissions);
 
           navigate("/home");
-
         })
         .catch((error) => {
           setView(true);
