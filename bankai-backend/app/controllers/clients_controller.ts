@@ -140,6 +140,38 @@ export default class ClientsController {
     }
   }
 
+  // funcao pro cliente pegar seus propios dados
+
+  async me({ auth, response }: HttpContext) {
+    try {
+      const user = await auth.getUserOrFail()
+
+
+      await user.load('address')
+      await user.load('account')
+
+      return response.status(200).json({
+        message: 'OK',
+        data: {
+          id: user.id,
+          fullName: user.fullName,
+          email: user.email,
+          cpf: user.cpf,
+          address: user.address,
+          account: {
+            agency: user.account.agency,
+            number: user.account.id,
+            balance: user.account.balance,
+          }
+        },
+      })
+    } catch (error) {
+      return response.status(500).json({
+        message: 'Erro ao buscar dados do usuário',
+        error: error.message,
+      })
+    }
+  }
   /**
    * Remover um cliente
    */

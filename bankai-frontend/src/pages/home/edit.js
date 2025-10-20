@@ -9,7 +9,7 @@ import { getDataUser } from '../../service/UserService';
 
 export default function Edit() {
     const location = useLocation();
-    const cliente = location.state?.item; // dados passados da lista
+    const cliente = location.state?.item; 
 
     const [fullName, setFullName] = useState(cliente?.full_name || '');
     const [email, setEmail] = useState(cliente?.email || '');

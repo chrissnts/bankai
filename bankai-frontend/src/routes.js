@@ -7,6 +7,7 @@ import HomeCreate from "./pages/home/create";
 import HomeEdit from "./pages/home/edit";
 import Account from "./pages/accounts";
 import CreateAccount from "./pages/accounts/create";
+import ClientBalance from "./pages/client/balance";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
   {
     path: "/home/edit",
     element: <HomeEdit />
+  },
+  {
+    path: "client/balance",
+    element: <ClientBalance />
   },
   {
     path: "/accounts",

@@ -2,7 +2,7 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 
 /**
- * Rota inicial
+ * Rota inicial - API online
  */
 router.get('/', async () => {
   return { message: 'API ONLINE' }
@@ -13,11 +13,11 @@ router.get('/', async () => {
  */
 router
   .group(() => {
-    // Rotas públicas
+    // Rotas públicas de autenticação
     router.post('/register', '#controllers/auth_controller.register')
     router.post('/login', '#controllers/auth_controller.login')
 
-    // Rotas protegidas por login
+    // Rotas protegidas (usuário logado)
     router
       .group(() => {
         router.post('/logout', '#controllers/auth_controller.logout')
@@ -30,7 +30,7 @@ router
   .prefix('/auth')
 
 /**
- * Rotas de Clientes (apenas admin)
+ * Rotas de Clientes — restrito a admin
  */
 router
   .group(() => {
@@ -40,10 +40,10 @@ router
     router.delete('/:id', '#controllers/clients_controller.destroy')
   })
   .prefix('/clients')
-  .use([middleware.auth(), middleware.admin()])
+  .middleware([middleware.auth(), middleware.admin()])
 
 /**
- * Rotas de Contas
+ * Rotas de Contas — restrito a admin
  */
 router
   .group(() => {
@@ -54,10 +54,10 @@ router
     router.delete('/:id', '#controllers/accounts_controller.destroy')
   })
   .prefix('/accounts')
-  .use([middleware.auth(), middleware.admin()])
+  .middleware([middleware.auth(), middleware.admin()])
 
 /**
- * Rotas de transações do usuário (Pix, Aplicação, Extrato)
+ * Rotas de Transações — apenas usuário autenticado
  */
 router
   .group(() => {
@@ -66,4 +66,4 @@ router
     router.get('/:id', '#controllers/transactions_controller.show')
   })
   .prefix('/transactions')
-  .use([middleware.auth()])
+  .middleware([middleware.auth()])
