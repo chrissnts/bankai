@@ -2,10 +2,13 @@ import Transaction from '#models/transaction'
 import TransactionPolicy from '#policies/transaction_policy'
 import { createTransaction } from '#validators/transaction'
 import type { HttpContext } from '@adonisjs/core/http'
+import Account from '#models/account'
+import Database from '@ioc:Adonis/Lucid/Database'
+
 
 export default class TransactionsController {
   /**
-   * Display a list of resource
+   * Lista todas as transações
    */
   async index({ auth, bouncer, response }: HttpContext) {
     try {
@@ -15,15 +18,16 @@ export default class TransactionsController {
         return response.forbidden({ message: 'Você não tem permissão para listar transações' })
       }
 
-      const transactions = await Transaction.query().preload('account', (AccountQuery) =>
-        AccountQuery.select('id', 'account_number')
+      const transactions = await Transaction.query().preload('account', (query) =>
+        query.select('id', 'account_number')
       )
 
-      return response.status(201).json({
+      return response.status(200).json({
         message: 'OK',
         data: transactions,
       })
     } catch (error) {
+      console.error(error)
       return response.status(500).json({
         message: 'Erro ao listar transações',
       })
@@ -31,11 +35,7 @@ export default class TransactionsController {
   }
 
   /**
-   * Display form to create a new record
-   */
-
-  /**
-   * Handle form submission for the create action
+   * Cria uma transação genérica (não Pix)
    */
   async store({ request, bouncer, auth, response }: HttpContext) {
     try {
@@ -48,15 +48,14 @@ export default class TransactionsController {
       const body = request.body()
       const payload = await createTransaction.validate(body)
 
-      const transaction = await Transaction.create({
-        ...payload,
-      })
+      const transaction = await Transaction.create(payload)
 
       return response.status(201).json({
         message: 'Transação feita com sucesso',
         data: transaction,
       })
     } catch (error) {
+      console.error(error)
       return response.status(500).json({
         message: 'Erro na transação',
       })
@@ -64,40 +63,112 @@ export default class TransactionsController {
   }
 
   /**
-   * Show individual record
+   * Transferência Pix entre contas
+   */
+  async transfer({ request, auth, response }: HttpContext) {
+    const trx = await Database.transaction()
+
+    try {
+      const user = await auth.getUserOrFail()
+
+      const {
+        from_account: fromAccount,
+        to_account: toAccount,
+        amount,
+      } = request.only(['from_account', 'to_account', 'amount'])
+
+      // validaçoes (que provavelmente era pra ser na service)
+      if (!fromAccount || !toAccount || !amount || Number.isNaN(Number(amount))) {
+        await trx.rollback()
+        return response.status(400).json({ message: 'Dados inválidos para transferência' })
+      }
+
+      if (fromAccount === toAccount) {
+        await trx.rollback()
+        return response
+          .status(400)
+          .json({ message: 'Não é possível transferir para a mesma conta' })
+      }
+
+      // busca contas
+      const source = await Account.find(fromAccount)
+      const destination = await Account.find(toAccount)
+
+      if (!source) {
+        await trx.rollback()
+        return response.status(404).json({ message: 'Conta de origem não encontrada' })
+      }
+
+      if (!destination) {
+        await trx.rollback()
+        return response.status(404).json({ message: 'Conta de destino não encontrada' })
+      }
+
+      // verifica saldo suficiente
+      if (source.balance < amount) {
+        await trx.rollback()
+        return response.status(400).json({ message: 'Saldo insuficiente para a transferência' })
+      }
+
+      // atualiza saldos 
+      source.balance -= amount
+      destination.balance += amount
+
+      await source.useTransaction(trx).save()
+      await destination.useTransaction(trx).save()
+
+      // cria as transactions
+      await Transaction.create({
+        account_id: source.id,
+        type: 'debito',
+        amount,
+        description: `Transferência Pix para conta ${destination.account_number}`,
+      })
+
+      await Transaction.create({
+        account_id: destination.id,
+        type: 'credito',
+        amount,
+        description: `Transferência Pix recebida da conta ${source.account_number}`,
+      })
+
+      await trx.commit()
+
+      return response.status(201).json({
+        message: 'Transferência realizada com sucesso!',
+      })
+    } catch (error) {
+      await trx.rollback()
+      console.error(error)
+      return response.status(500).json({ message: 'Erro ao realizar transferência' })
+    }
+  }
+
+
+  /**
+   * Mostra uma transação individual
    */
   async show({ params, auth, response, bouncer }: HttpContext) {
     try {
-      const user = auth.getUserOrFail()
+      await auth.getUserOrFail()
 
       if (await bouncer.with(TransactionPolicy).denies('view')) {
         return response.forbidden({ message: 'Você não tem permissão para ver esta transação' })
       }
 
-      const transaction = await Transaction.query().where('id', params.id)
+      const transaction = await Transaction.query().where('id', params.id).first()
 
-      return response.status(201).json({
+      if (!transaction) {
+        return response.status(404).json({ message: 'Transação não encontrada' })
+      }
+
+      return response.status(200).json({
         message: 'OK',
         data: transaction,
       })
     } catch (error) {
-      return response.status(500).json({
-        message: 'Error',
-      })
+      console.error(error)
+      return response.status(500).json({ message: 'Erro ao buscar transação' })
     }
   }
-
-  /**
-   * Edit individual record
-   */
-
-  /**
-   * Handle form submission for the edit action
-   */
-  async update({ params, request }: HttpContext) {}
-
-  /**
-   * Delete record
-   */
-  async destroy({ params }: HttpContext) {}
 }

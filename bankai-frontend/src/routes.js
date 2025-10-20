@@ -8,6 +8,7 @@ import HomeEdit from "./pages/home/edit";
 import Account from "./pages/accounts";
 import CreateAccount from "./pages/accounts/create";
 import ClientBalance from "./pages/client/balance";
+import ClientTransfer from "./pages/client/transfer";
 import AccountEdit from "./pages/accounts/edit";
 
 const router = createBrowserRouter([
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
     element: <ClientBalance />
   },
   {
+    path: "/client/transfer",
+    element: <ClientTransfer />
+  },
+  {
     path: "/accounts",
     element: <Account />,
   },
@@ -51,6 +56,7 @@ const router = createBrowserRouter([
     path: "/accounts/edit",
     element: <AccountEdit />
   },
+ 
   
 ]);
 

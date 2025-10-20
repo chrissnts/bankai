@@ -15,6 +15,9 @@ export default class Transaction extends BaseModel {
 
   @column()
   declare account_id: number 
+
+  @column()
+  declare description: string
   
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

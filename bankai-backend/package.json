@@ -55,7 +55,7 @@
     "@adonisjs/bouncer": "^3.1.6",
     "@adonisjs/core": "^6.18.0",
     "@adonisjs/cors": "^2.2.1",
-    "@adonisjs/lucid": "^21.6.1",
+    "@adonisjs/lucid": "^21.8.0",
     "@vinejs/vine": "^3.0.1",
     "luxon": "^3.7.2",
     "mysql2": "^3.15.1",

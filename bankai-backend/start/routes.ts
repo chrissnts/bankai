@@ -64,6 +64,7 @@ router
     router.get('/', '#controllers/transactions_controller.index')
     router.post('/', '#controllers/transactions_controller.store')
     router.get('/:id', '#controllers/transactions_controller.show')
+    router.post('/transfer', '#controllers/transactions_controller.transfer')
   })
   .prefix('/transactions')
   .middleware([middleware.auth()])
