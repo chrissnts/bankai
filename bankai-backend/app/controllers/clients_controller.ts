@@ -145,8 +145,6 @@ export default class ClientsController {
   async me({ auth, response }: HttpContext) {
     try {
       const user = await auth.getUserOrFail()
-
-
       await user.load('address')
       await user.load('account')
 
@@ -158,11 +156,13 @@ export default class ClientsController {
           email: user.email,
           cpf: user.cpf,
           address: user.address,
-          account: {
-            agency: user.account.agency,
-            number: user.account.id,
-            balance: user.account.balance,
-          }
+          account: user.account
+            ? {
+              agency: user.account.agency,
+              number: user.account.id,
+              balance: user.account.balance,
+            }
+            : null,
         },
       })
     } catch (error) {
@@ -172,6 +172,8 @@ export default class ClientsController {
       })
     }
   }
+
+
   /**
    * Remover um cliente
    */

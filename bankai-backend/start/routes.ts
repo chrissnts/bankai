@@ -67,3 +67,14 @@ router
   })
   .prefix('/transactions')
   .middleware([middleware.auth()])
+
+/**
+ * Rota do cliente logado — acessa seus próprios dados
+ */
+router
+  .group(() => {
+    router.get('/me', '#controllers/clients_controller.me')
+  })
+  .prefix('/clients')
+  .middleware([middleware.auth()])
+
