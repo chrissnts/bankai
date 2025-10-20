@@ -30,7 +30,7 @@ export default function Home() {
       navigate("/login");
       return;
     }
-    
+    console.log(dataUser)
     if (dataUser.paper_id === 1) {
       fetchClients();
     } else setLoad(false); 

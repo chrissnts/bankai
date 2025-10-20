@@ -5,7 +5,6 @@ import logger from '@adonisjs/core/services/logger'
 import { permissions } from '../utils/permissions.js'
 
 export default class AuthController {
-  
   async register({ request, response }: HttpContext) {
     try {
       const payload = await request.validateUsing(registerValidator)
@@ -65,6 +64,7 @@ export default class AuthController {
           id: user.id,
           fullName: user.fullName,
           email: user.email,
+          paper_id: user.paper_id,
         },
         token: {
           type: 'bearer',
@@ -136,14 +136,14 @@ export default class AuthController {
       const tokens = await User.accessTokens.all(user)
 
       return response.ok({
-        tokens: tokens.map(token => ({
+        tokens: tokens.map((token) => ({
           name: token.name,
           type: token.type,
           abilities: token.abilities,
           lastUsedAt: token.lastUsedAt,
           expiresAt: token.expiresAt,
           createdAt: token.createdAt,
-        }))
+        })),
       })
     } catch (error) {
       return response.unauthorized({
