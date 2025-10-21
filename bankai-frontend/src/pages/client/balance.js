@@ -56,7 +56,7 @@ export default function Balance() {
             <Card.Body>
               <Card.Title className="mb-4 fs-3">Saldo da Conta</Card.Title>
               <Card.Text>
-                <strong>Nome:</strong> {data.fullName}
+                <strong>Nome:</strong> {data.full_name}
               </Card.Text>
               <Card.Text>
                 <strong>Agência:</strong> {data.account?.agency || "N/A"}

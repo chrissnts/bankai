@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { Container, Card, Form, Button, Modal, Spinner, Alert } from "react-bootstrap";
+import {
+  Container,
+  Card,
+  Form,
+  Button,
+  Modal,
+  Spinner,
+  Alert,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import NavigationBar from "../../components/navigationbar";
 import { Client } from "../../api/client";
@@ -11,9 +19,9 @@ export default function Transfer() {
   const [amount, setAmount] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
+   const [data, setData] = useState([]);
   const [load, setLoad] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
-  const [myData, setMyData] = useState(null);
 
   const navigate = useNavigate();
   const dataUser = getDataUser();
@@ -33,9 +41,14 @@ export default function Transfer() {
     }
 
     Client.get("clients/me")
-      .then((res) => setMyData(res.data.data))
-      .catch((err) => setErrorMsg("Erro ao carregar dados da conta."))
+      .then((res) => {
+        const cliente = res.data.data;
+        setData(cliente);
+      })
+      .catch((error) => console.log(error))
       .finally(() => setLoad(false));
+
+    setLoad(false);
   }, []);
 
   function handleTransfer() {
@@ -52,8 +65,8 @@ export default function Transfer() {
     }
 
     const transferData = {
-      from_account: myData?.account?.id,
-      to_account: destinationAccount,
+      fromAccount: data.account.number,
+      toAccount: destinationAccount,
       amount: parseFloat(amount),
     };
 
@@ -66,7 +79,9 @@ export default function Transfer() {
       })
       .catch((err) => {
         console.error(err);
-        setMessage("Erro ao realizar transferência. Verifique os dados e tente novamente.");
+        setMessage(
+          "Erro ao realizar transferência. Verifique os dados e tente novamente."
+        );
         setShowModal(true);
       });
   }
@@ -108,7 +123,7 @@ export default function Transfer() {
               </Form.Group>
 
               <div className="d-flex justify-content-center gap-3">
-                <Button variant="secondary" onClick={() => navigate("/client/home")}>
+                <Button variant="secondary" onClick={() => navigate("/home")}>
                   Voltar
                 </Button>
                 <Button variant="primary" onClick={handleTransfer}>

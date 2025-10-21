@@ -3,8 +3,7 @@ import TransactionPolicy from '#policies/transaction_policy'
 import { createTransaction } from '#validators/transaction'
 import type { HttpContext } from '@adonisjs/core/http'
 import Account from '#models/account'
-import Database from '@ioc:Adonis/Lucid/Database'
-
+import db from '@adonisjs/lucid/services/db'
 
 export default class TransactionsController {
   /**
@@ -66,17 +65,20 @@ export default class TransactionsController {
    * Transferência Pix entre contas
    */
   async transfer({ request, auth, response }: HttpContext) {
-    const trx = await Database.transaction()
+    const trx = await db.transaction()
 
     try {
       const user = await auth.getUserOrFail()
 
-      const {
-        from_account: fromAccount,
-        to_account: toAccount,
-        amount,
-      } = request.only(['from_account', 'to_account', 'amount'])
+      const { fromAccount, toAccount, amount } = request.only([
+        'fromAccount',
+        'toAccount',
+        'amount',
+      ])
 
+      console.log('fromAccount:', fromAccount)
+      console.log('toAccount:', toAccount)
+      console.log('amount:', amount)
       // validaçoes (que provavelmente era pra ser na service)
       if (!fromAccount || !toAccount || !amount || Number.isNaN(Number(amount))) {
         await trx.rollback()
@@ -92,7 +94,7 @@ export default class TransactionsController {
 
       // busca contas
       const source = await Account.find(fromAccount)
-      const destination = await Account.find(toAccount)
+      const destination = await Account.find(toAccount);
 
       if (!source) {
         await trx.rollback()
@@ -110,7 +112,7 @@ export default class TransactionsController {
         return response.status(400).json({ message: 'Saldo insuficiente para a transferência' })
       }
 
-      // atualiza saldos 
+      // atualiza saldos
       source.balance -= amount
       destination.balance += amount
 
@@ -120,14 +122,14 @@ export default class TransactionsController {
       // cria as transactions
       await Transaction.create({
         account_id: source.id,
-        type: 'debito',
+        type: 'pix',
         amount,
         description: `Transferência Pix para conta ${destination.account_number}`,
       })
 
       await Transaction.create({
         account_id: destination.id,
-        type: 'credito',
+        type: 'pix',
         amount,
         description: `Transferência Pix recebida da conta ${source.account_number}`,
       })
@@ -143,7 +145,6 @@ export default class TransactionsController {
       return response.status(500).json({ message: 'Erro ao realizar transferência' })
     }
   }
-
 
   /**
    * Mostra uma transação individual

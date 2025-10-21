@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.decimal('amount', 12, 2).notNullable()
       table.string('type').notNullable() 
+      table.string('description').notNullable()
       table.integer('account_id').unsigned().references('id').inTable('accounts').onDelete('CASCADE').onUpdate('CASCADE')
       table.timestamps(true, true)
     })
