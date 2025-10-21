@@ -95,7 +95,7 @@ export default class TransactionsController {
         return response.status(400).json({ message: 'Dados inválidos para transferência' })
       }
 
-      if (fromAccount.id === toAccount.id) {
+      if (fromAccount === toAccount) {
         await trx.rollback()
         return response
           .status(400)

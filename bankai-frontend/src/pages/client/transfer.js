@@ -47,6 +47,8 @@ export default function Transfer() {
       })
       .catch((error) => console.log(error))
       .finally(() => setLoad(false));
+
+    setLoad(false);
   }, []);
 
   function handleTransfer() {
@@ -68,6 +70,7 @@ export default function Transfer() {
       amount: parseFloat(amount),       // float parseado
     };
 
+
     Client.post("transactions/transfer", transferData)
       .then((res) => {
         setMessage("Transferência realizada com sucesso!");
@@ -77,13 +80,8 @@ export default function Transfer() {
       })
       .catch((err) => {
         console.error(err);
-
-        // Extrai mensagem do backend, se existir
-        const backendMessage = err.response?.data?.message;
-
         setMessage(
-          backendMessage ||
-            "Erro ao realizar transferência. Verifique os dados e tente novamente."
+          "Erro ao realizar transferência. Verifique os dados e tente novamente."
         );
         setShowModal(true);
       });
@@ -137,6 +135,8 @@ export default function Transfer() {
           </Card>
         )}
       </Container>
+
+
 
       {/* Modal de feedback */}
       <Modal show={showModal} onHide={handleClose}>
