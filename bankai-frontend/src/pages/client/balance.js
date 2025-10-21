@@ -15,33 +15,30 @@ export default function Balance() {
   const permissions = getPermissions();
 
   function verifyPermission() {
-    // Não Autenticado
     if (!dataUser) navigate("/login");
-    // Não Autorizado (rota anterior)
     else if (permissions.listClients === 0) navigate(-1);
   }
 
   useEffect(() => {
-
     verifyPermission();
+
     if (!dataUser) {
       navigate("/login");
       return;
     }
-    console.log(dataUser)
 
     Client.get("clients/me")
       .then((res) => {
         const cliente = res.data.data;
         setData(cliente);
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        console.error(error);
+        const backendMsg = error.response?.data?.message;
+        setErrorMsg(backendMsg || "Erro ao carregar dados do cliente.");
+      })
       .finally(() => setLoad(false));
-
-    setLoad(false);
   }, []);
-
-
 
   return (
     <>

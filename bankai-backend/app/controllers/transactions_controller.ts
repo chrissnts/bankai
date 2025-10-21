@@ -4,35 +4,44 @@ import { createTransaction } from '#validators/transaction'
 import type { HttpContext } from '@adonisjs/core/http'
 import Account from '#models/account'
 import db from '@adonisjs/lucid/services/db'
-import { configureSuite } from '#tests/bootstrap'
 
 export default class TransactionsController {
   /**
    * Lista todas as transações
    */
   async index({ auth, bouncer, response }: HttpContext) {
-    try {
-      const user = await auth.getUserOrFail()
+  try {
+    const user = await auth.getUserOrFail();
 
-      if (await bouncer.with(TransactionPolicy).denies('list')) {
-        return response.forbidden({ message: 'Você não tem permissão para listar transações' })
-      }
-
-      const transactions = await Transaction.query().preload('account', (query) =>
-        query.select('id', 'account_number')
-      )
-
-      return response.status(200).json({
-        message: 'OK',
-        data: transactions,
-      })
-    } catch (error) {
-      console.error(error)
-      return response.status(500).json({
-        message: 'Erro ao listar transações',
-      })
+    if (await bouncer.with(TransactionPolicy).denies('list')) {
+      return response.forbidden({ message: 'Você não tem permissão para listar transações' });
     }
+
+    // Busca a conta do usuário para pegar o id da conta
+    const account = await user.related('account').query().first();
+
+    if (!account) {
+      return response.status(404).json({ message: 'Conta do usuário não encontrada' });
+    }
+
+    // Busca transações da conta do usuário, preload account selecionando só id e account_number (id usado)
+    const transactions = await Transaction.query()
+      .where('account_id', account.id)
+      .preload('account', (query) => query.select('id')) // seleciona só o id da conta
+    
+
+    return response.status(200).json({
+      message: 'OK',
+      data: transactions,
+    });
+  } catch (error) {
+    console.error(error);
+    return response.status(500).json({
+      message: 'Erro ao listar transações',
+    });
   }
+}
+
 
   /**
    * Cria uma transação genérica (não Pix)
@@ -86,7 +95,7 @@ export default class TransactionsController {
         return response.status(400).json({ message: 'Dados inválidos para transferência' })
       }
 
-      if (fromAccount === toAccount) {
+      if (fromAccount.id === toAccount.id) {
         await trx.rollback()
         return response
           .status(400)
@@ -152,6 +161,49 @@ export default class TransactionsController {
       return response.status(500).json({ message: 'Erro ao realizar transferência' })
     }
   }
+
+  /**
+ * Deposita dinheiro na própria conta (poupança)
+ */
+async deposit({ request, auth, response }: HttpContext) {
+  const trx = await db.transaction()
+
+  try {
+    const user = await auth.getUserOrFail()
+    const { amount } = request.only(['amount'])
+
+    if (!amount || Number.isNaN(Number(amount)) || Number(amount) <= 0) {
+      return response.status(400).json({ message: 'Valor de depósito inválido' })
+    }
+
+    const depositAmount = Number(parseFloat(amount).toFixed(2))
+
+
+    const account = await Account.findByOrFail('user_id', user.id)
+    account.balance = Number((Number(account.balance) + depositAmount).toFixed(2))
+
+    await account.useTransaction(trx).save()
+
+
+    await Transaction.create({
+      account_id: account.id,
+      type: 'deposit',
+      amount: depositAmount,
+      description: 'Depósito em poupança',
+    }, { client: trx })
+
+
+    await trx.commit()
+
+    return response.status(201).json({ message: 'Depósito realizado com sucesso!' })
+
+  } catch (error) {
+    await trx.rollback()
+    console.error(error)
+    return response.status(500).json({ message: 'Erro ao realizar depósito' })
+  }
+}
+
 
   /**
    * Mostra uma transação individual

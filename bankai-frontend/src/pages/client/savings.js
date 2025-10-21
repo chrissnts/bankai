@@ -14,8 +14,7 @@ import { Client } from "../../api/client";
 import { getDataUser } from "../../service/UserService";
 import { getPermissions } from "../../service/PermissionService";
 
-export default function Transfer() {
-  const [destinationAccount, setDestinationAccount] = useState("");
+export default function Savings() {
   const [amount, setAmount] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
@@ -42,51 +41,34 @@ export default function Transfer() {
 
     Client.get("clients/me")
       .then((res) => {
-        const cliente = res.data.data;
-        setData(cliente);
+        setData(res.data.data);
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        console.error(error);
+        const backendMsg = error.response?.data?.message;
+        setErrorMsg(backendMsg || "Erro ao carregar dados do cliente.");
+      })
       .finally(() => setLoad(false));
   }, []);
 
-  function handleTransfer() {
-    if (!destinationAccount || !amount) {
-      setMessage("Todos os campos são obrigatórios!");
+  function handleDeposit() {
+    if (!amount || parseFloat(amount) <= 0) {
+      setMessage("Digite um valor válido para depositar.");
       setShowModal(true);
       return;
     }
 
-    if (parseFloat(amount) <= 0) {
-      setMessage("O valor da transferência deve ser maior que zero!");
-      setShowModal(true);
-      return;
-    }
-
-    const transferData = {
-      fromAccount: data.account.number, // número da conta origem como string
-      toAccount: destinationAccount,    // número da conta destino como string
-      amount: parseFloat(amount),       // float parseado
-    };
-
-    Client.post("transactions/transfer", transferData)
-      .then((res) => {
-        setMessage("Transferência realizada com sucesso!");
-        setShowModal(true);
+    Client.post("transactions/deposit", { amount: parseFloat(amount) })
+      .then(() => {
+        setMessage("Depósito realizado com sucesso!");
         setAmount("");
-        setDestinationAccount("");
       })
       .catch((err) => {
         console.error(err);
-
-        // Extrai mensagem do backend, se existir
-        const backendMessage = err.response?.data?.message;
-
-        setMessage(
-          backendMessage ||
-            "Erro ao realizar transferência. Verifique os dados e tente novamente."
-        );
-        setShowModal(true);
-      });
+        const backendMsg = err.response?.data?.message;
+        setMessage(backendMsg || "Erro ao realizar o depósito. Tente novamente.");
+      })
+      .finally(() => setShowModal(true));
   }
 
   const handleClose = () => setShowModal(false);
@@ -102,20 +84,10 @@ export default function Transfer() {
         ) : (
           <Card style={{ width: "30rem" }} className="shadow text-center">
             <Card.Body>
-              <Card.Title className="mb-4 fs-3">Transferência (Pix)</Card.Title>
-
-              <Form.Group className="mb-3 text-start">
-                <Form.Label>Número da Conta Destino</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Ex: 000123"
-                  value={destinationAccount}
-                  onChange={(e) => setDestinationAccount(e.target.value)}
-                />
-              </Form.Group>
+              <Card.Title className="mb-4 fs-3">Depósito em Poupança</Card.Title>
 
               <Form.Group className="mb-4 text-start">
-                <Form.Label>Valor da Transferência</Form.Label>
+                <Form.Label>Valor do Depósito</Form.Label>
                 <Form.Control
                   type="number"
                   step="0.01"
@@ -129,8 +101,8 @@ export default function Transfer() {
                 <Button variant="secondary" onClick={() => navigate("/home")}>
                   Voltar
                 </Button>
-                <Button variant="primary" onClick={handleTransfer}>
-                  Enviar
+                <Button variant="success" onClick={handleDeposit}>
+                  Depositar
                 </Button>
               </div>
             </Card.Body>

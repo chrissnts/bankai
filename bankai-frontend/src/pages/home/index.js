@@ -116,10 +116,10 @@ export default function Home() {
           <Col md={4}>
             <Card className="text-center">
               <Card.Body>
-                <Card.Title>Aplicação Financeira</Card.Title>
+                <Card.Title>Poupança</Card.Title>
                 <Button
                   variant="warning"
-                  onClick={() => navigate("/client/invest")}
+                  onClick={() => navigate("/client/savings")}
                 >
                   Acessar
                 </Button>
