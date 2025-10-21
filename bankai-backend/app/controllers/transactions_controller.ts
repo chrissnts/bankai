@@ -4,6 +4,7 @@ import { createTransaction } from '#validators/transaction'
 import type { HttpContext } from '@adonisjs/core/http'
 import Account from '#models/account'
 import db from '@adonisjs/lucid/services/db'
+import { configureSuite } from '#tests/bootstrap'
 
 export default class TransactionsController {
   /**
@@ -106,39 +107,45 @@ export default class TransactionsController {
         return response.status(404).json({ message: 'Conta de destino não encontrada' })
       }
 
+      const transferAmount = Number(parseFloat(amount).toFixed(2))
+
       // verifica saldo suficiente
-      if (source.balance < amount) {
+      if (source.balance < transferAmount) {
         await trx.rollback()
         return response.status(400).json({ message: 'Saldo insuficiente para a transferência' })
       }
 
       // atualiza saldos
-      source.balance -= amount
-      destination.balance += amount
+      source.balance = Number((Number(source.balance) - transferAmount).toFixed(2))
+      destination.balance = Number((Number(destination.balance) + transferAmount).toFixed(2))
 
       await source.useTransaction(trx).save()
       await destination.useTransaction(trx).save()
+
 
       // cria as transactions
       await Transaction.create({
         account_id: source.id,
         type: 'pix',
-        amount,
-        description: `Transferência Pix para conta ${destination.account_number}`,
-      })
+        amount: amount,
+        description: `Transferência Pix para ${destination.id}`,
+      }, { client: trx })
 
       await Transaction.create({
         account_id: destination.id,
         type: 'pix',
-        amount,
-        description: `Transferência Pix recebida da conta ${source.account_number}`,
-      })
+        amount: amount,
+        description: `Transferência Pix recebida da conta  ${source.id}`,
+      }, { client: trx })
+
 
       await trx.commit()
 
-      return response.status(201).json({
-        message: 'Transferência realizada com sucesso!',
-      })
+      return response
+        .status(201)
+        .json({
+          message: 'Transferência realizada com sucesso!',
+        })
     } catch (error) {
       await trx.rollback()
       console.error(error)

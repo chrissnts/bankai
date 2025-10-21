@@ -19,7 +19,7 @@ export default function Transfer() {
   const [amount, setAmount] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
-   const [data, setData] = useState([]);
+  const [data, setData] = useState([]);
   const [load, setLoad] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -65,10 +65,11 @@ export default function Transfer() {
     }
 
     const transferData = {
-      fromAccount: data.account.number,
-      toAccount: destinationAccount,
-      amount: parseFloat(amount),
+      fromAccount: data.account.number, // número da conta origem como string
+      toAccount: destinationAccount,    // número da conta destino como string
+      amount: parseFloat(amount),       // float parseado
     };
+
 
     Client.post("transactions/transfer", transferData)
       .then((res) => {
